@@ -3,24 +3,15 @@ import sqlite3
 from datetime import datetime
 import random
 import pandas as pd
-import webbrowser
 
-# Conexión con la base de datos SQLite
+# Conexión SQLite
 conn = sqlite3.connect('sporti_data.db')
 c = conn.cursor()
 
 # Crear tablas si no existen
-c.execute("""CREATE TABLE IF NOT EXISTS usuarios (
-    correo TEXT PRIMARY KEY,
-    nombre TEXT, clave TEXT, sexo TEXT, edad INTEGER, altura INTEGER,
-    tipo_corredor TEXT, foto TEXT, estilo_musical TEXT, vo2_max INTEGER)""")
+c.execute("CREATE TABLE IF NOT EXISTS usuarios (correo TEXT PRIMARY KEY, nombre TEXT, clave TEXT, sexo TEXT, edad INTEGER, altura INTEGER, tipo_corredor TEXT, foto TEXT, estilo_musical TEXT, vo2_max INTEGER)")
+c.execute("CREATE TABLE IF NOT EXISTS sesiones (id INTEGER PRIMARY KEY AUTOINCREMENT, correo TEXT, fecha TEXT, entrenamiento TEXT, distancia INTEGER, bpm_actual INTEGER, fatiga TEXT, playlist TEXT, mensaje TEXT)")
 
-c.execute("""CREATE TABLE IF NOT EXISTS sesiones (
-    id INTEGER PRIMARY KEY AUTOINCREMENT, correo TEXT, fecha TEXT,
-    entrenamiento TEXT, distancia INTEGER, bpm_actual INTEGER,
-    fatiga TEXT, playlist TEXT, mensaje TEXT)""")
-
-# Interfaz
 st.title("🎧 SPORTI v5 – App avanzada con persistencia")
 
 # Funciones
@@ -29,8 +20,7 @@ def login(correo, clave):
     return c.fetchone()
 
 def registrar_usuario(correo, nombre, clave, sexo, edad, altura, tipo_corredor, foto, estilo_musical, vo2_max):
-    c.execute("INSERT INTO usuarios VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-              (correo, nombre, clave, sexo, edad, altura, tipo_corredor, foto, estilo_musical, vo2_max))
+    c.execute("INSERT INTO usuarios VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (correo, nombre, clave, sexo, edad, altura, tipo_corredor, foto, estilo_musical, vo2_max))
     conn.commit()
 
 # Estado de sesión
@@ -38,12 +28,6 @@ if "usuario_actual" not in st.session_state:
     st.session_state.usuario_actual = None
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
-if "user_email" not in st.session_state:
-    st.session_state.user_email = ""
-if "bpm_actual" not in st.session_state:
-    st.session_state.bpm_actual = None
-if "fatiga" not in st.session_state:
-    st.session_state.fatiga = None
 if "fase" not in st.session_state:
     st.session_state.fase = "inicio"
 
@@ -51,8 +35,8 @@ menu = st.sidebar.selectbox("Menú", ["Iniciar sesión", "Registrarse", "Admin"]
 
 if st.session_state.logged_in:
     usuario = st.session_state.usuario_actual
-    nombre_usuario = usuario[1]
     correo = usuario[0]
+    nombre_usuario = usuario[1]
     sexo = usuario[3]
     edad = usuario[4]
     altura = usuario[5]
@@ -73,6 +57,7 @@ if st.session_state.logged_in:
     if st.sidebar.button("Cerrar sesión"):
         st.session_state.logged_in = False
         st.session_state.usuario_actual = None
+        st.session_state.fase = "inicio"
         st.rerun()
 
     st.subheader("🏃 Simulador de Entrenamiento")
@@ -87,13 +72,10 @@ if st.session_state.logged_in:
     if st.session_state.fase == "entrenamiento":
         bpm_actual = st.session_state.bpm_actual
         fatiga = st.session_state.fatiga
-
-        st.markdown(f"**BPM actual:** {bpm_actual}")
-        st.markdown(f"**Fatiga reportada:** {fatiga}")
-
         tipo_entrenamiento = st.selectbox("Tipo de entrenamiento", ["Zona 2", "Tempo", "Intervalos", "Fondo largo", "Recuperación"])
         distancia = st.slider("Kilómetros", 1, 20, 5)
-
+        st.markdown(f"**BPM actual:** {bpm_actual}")
+        st.markdown(f"**Fatiga reportada:** {fatiga}")
         st.markdown("**BPM esperado:** 119 - 130")
         st.markdown(f"**VO₂ max actual:** {vo2_max}")
 
@@ -108,43 +90,42 @@ if st.session_state.logged_in:
         if st.button("🎶 Buscar Playlist"):
             combinaciones = pd.read_excel("Sporti_Combinaciones_Musicales_Final.xlsx")
             filtro = combinaciones[
-                    (combinaciones["Tipo_entrenamiento"] == tipo_entrenamiento) &
-                    (combinaciones["Estilo_musical"] == estilo_musical) &
-                    (combinaciones["Fatiga"] == fatiga)
-                ]
-    
+                (combinaciones["Tipo_entrenamiento"] == tipo_entrenamiento) &
+                (combinaciones["Estilo_musical"] == estilo_musical) &
+                (combinaciones["Fatiga"] == fatiga)
+            ]
             if not filtro.empty:
                 playlist = filtro.iloc[0]["Link_musica"]
-                url = filtro.iloc[0]["Link_musica"]  # Es el mismo valor
-                mensaje = "Playlist recomendada según tu estado actual y tipo de entrenamiento."
-                
                 st.session_state.resultado_playlist = playlist
                 st.session_state.resultado_mensaje = mensaje
-                st.session_state.resultado_url = url
+                st.session_state.resultado_url = playlist
+                st.session_state.tipo_entrenamiento = tipo_entrenamiento
+                st.session_state.distancia = distancia
                 st.session_state.fase = "playlist"
             else:
                 st.warning("No se encontró una playlist recomendada para esta combinación.")
-             # Esto va FUERA del else, con la misma indentación del if principal
-        if st.session_state.fase == "playlist":
-            st.success(f"Playlist recomendada: [{st.session_state.resultado_playlist}]({st.session_state.resultado_url})")
-            st.markdown(
-        f'<a href="{st.session_state.resultado_url}" target="_blank">'
-        f'<button style="background-color: #1DB954; color: white; padding: 10px; border: none; border-radius: 5px;">'
-        f'🎵 Ir a Playlist en Spotify</button></a>',
-        unsafe_allow_html=True
-    )       
+
+    if st.session_state.fase == "playlist":
+        st.success(f"Playlist recomendada: {st.session_state.resultado_playlist}")
+        st.markdown(
+            f'<a href="{st.session_state.resultado_url}" target="_blank">'
+            f'<button style="background-color:#1DB954; color:white; padding:10px; border:none; border-radius:5px;">'
+            f"🎧 Ir a Playlist en Spotify</button></a>", unsafe_allow_html=True)
         if st.button("✅ Ya comencé, continuar"):
-            st.session_state.fase = "ejecutando"       
-            if st.session_state.fase == "ejecutando":
-                st.success("Sesión musical en curso. ¡Disfruta tu entrenamiento!")
-                if st.button("⏹ Finalizar sesión"):
-                    c.execute("""INSERT INTO sesiones (correo, fecha, entrenamiento, distancia, bpm_actual, fatiga, playlist, mensaje)
-                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                              (correo, datetime.now().strftime("%Y-%m-%d %H:%M"), tipo_entrenamiento, distancia,
-                               bpm_actual, fatiga, st.session_state.resultado_playlist, st.session_state.resultado_mensaje))
-                    conn.commit()
-                    st.success("Sesión guardada exitosamente.")
-                    st.session_state.fase = "inicio"
+            st.session_state.fase = "ejecutando"
+
+    if st.session_state.fase == "ejecutando":
+        st.success("Sesión musical en curso. ¡Disfruta tu entrenamiento!")
+        if st.button("⏹ Finalizar sesión"):
+            c.execute("INSERT INTO sesiones (correo, fecha, entrenamiento, distancia, bpm_actual, fatiga, playlist, mensaje) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", 
+                      (correo, datetime.now().strftime("%Y-%m-%d %H:%M"), st.session_state.tipo_entrenamiento,
+                       st.session_state.distancia, st.session_state.bpm_actual, st.session_state.fatiga,
+                       st.session_state.resultado_playlist, st.session_state.resultado_mensaje))
+            conn.commit()
+            st.success("Sesión guardada exitosamente.")
+            if st.button("🔙 Volver al inicio"):
+                st.session_state.fase = "inicio"
+                st.rerun()
 
 elif menu == "Iniciar sesión":
     correo = st.text_input("Correo electrónico")
