@@ -108,9 +108,9 @@ if st.session_state.logged_in:
         if st.button("🎶 Buscar Playlist"):
             combinaciones = pd.read_excel("Sporti_Combinaciones_Musicales_Final.xlsx")
             filtro = combinaciones[
-                (combinaciones["zona"] == tipo_entrenamiento) &
-                (combinaciones["musica"] == estilo_musical) &
-                (combinaciones["fatiga"] == fatiga)
+                (combinaciones["zona"] == Tipo_entrenamiento) &
+                (combinaciones["musica"] == Estilo_musical) &
+                (combinaciones["fatiga"] == Fatiga)
             ]
     
             if not filtro.empty:
