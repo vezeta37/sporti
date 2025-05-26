@@ -116,7 +116,7 @@ if st.session_state.logged_in:
             if not filtro.empty:
                 playlist = filtro.iloc[0]["Link_musica"]
                 url = filtro.iloc[0]["Link_musica"]  # Es el mismo valor
-                mensaje = filtro.iloc[0]["mensaje"]
+                mensaje = "Playlist recomendada según tu estado actual y tipo de entrenamiento."
                 
                 st.session_state.resultado_playlist = playlist
                 st.session_state.resultado_mensaje = mensaje
