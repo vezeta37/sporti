@@ -105,45 +105,45 @@ if st.session_state.logged_in:
 
         st.info(mensaje)
 
-    if st.button("🎶 Buscar Playlist"):
-        combinaciones = pd.read_excel("Sporti_Combinaciones_Musicales_Final.xlsx")
-        filtro = combinaciones[
-            (combinaciones["zona"] == tipo_entrenamiento) &
-            (combinaciones["musica"] == estilo_musical) &
-            (combinaciones["fatiga"] == fatiga)
-        ]
-
-        if not filtro.empty:
-            playlist = filtro.iloc[0]["playlist"]
-            url = filtro.iloc[0]["url"]
-            mensaje = filtro.iloc[0]["mensaje"]
-            st.session_state.resultado_playlist = playlist
-            st.session_state.resultado_mensaje = mensaje
-            st.session_state.resultado_url = url
-            st.session_state.fase = "playlist"
-        else:
-            st.warning("No se encontró una playlist recomendada para esta combinación.")
-         # Esto va FUERA del else, con la misma indentación del if principal
-    if st.session_state.fase == "playlist":
-        st.success(f"Playlist recomendada: [{st.session_state.resultado_playlist}]({st.session_state.resultado_url})")
-        st.markdown(
-    f'<a href="{st.session_state.resultado_url}" target="_blank">'
-    f'<button style="background-color: #1DB954; color: white; padding: 10px; border: none; border-radius: 5px;">'
-    f'🎵 Ir a Playlist en Spotify</button></a>',
-    unsafe_allow_html=True
-)       
-    if st.button("✅ Ya comencé, continuar"):
-        st.session_state.fase = "ejecutando"       
-        if st.session_state.fase == "ejecutando":
-            st.success("Sesión musical en curso. ¡Disfruta tu entrenamiento!")
-            if st.button("⏹ Finalizar sesión"):
-                c.execute("""INSERT INTO sesiones (correo, fecha, entrenamiento, distancia, bpm_actual, fatiga, playlist, mensaje)
-                             VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                          (correo, datetime.now().strftime("%Y-%m-%d %H:%M"), tipo_entrenamiento, distancia,
-                           bpm_actual, fatiga, st.session_state.resultado_playlist, st.session_state.resultado_mensaje))
-                conn.commit()
-                st.success("Sesión guardada exitosamente.")
-                st.session_state.fase = "inicio"
+        if st.button("🎶 Buscar Playlist"):
+            combinaciones = pd.read_excel("Sporti_Combinaciones_Musicales_Final.xlsx")
+            filtro = combinaciones[
+                (combinaciones["zona"] == tipo_entrenamiento) &
+                (combinaciones["musica"] == estilo_musical) &
+                (combinaciones["fatiga"] == fatiga)
+            ]
+    
+            if not filtro.empty:
+                playlist = filtro.iloc[0]["playlist"]
+                url = filtro.iloc[0]["url"]
+                mensaje = filtro.iloc[0]["mensaje"]
+                st.session_state.resultado_playlist = playlist
+                st.session_state.resultado_mensaje = mensaje
+                st.session_state.resultado_url = url
+                st.session_state.fase = "playlist"
+            else:
+                st.warning("No se encontró una playlist recomendada para esta combinación.")
+             # Esto va FUERA del else, con la misma indentación del if principal
+        if st.session_state.fase == "playlist":
+            st.success(f"Playlist recomendada: [{st.session_state.resultado_playlist}]({st.session_state.resultado_url})")
+            st.markdown(
+        f'<a href="{st.session_state.resultado_url}" target="_blank">'
+        f'<button style="background-color: #1DB954; color: white; padding: 10px; border: none; border-radius: 5px;">'
+        f'🎵 Ir a Playlist en Spotify</button></a>',
+        unsafe_allow_html=True
+    )       
+        if st.button("✅ Ya comencé, continuar"):
+            st.session_state.fase = "ejecutando"       
+            if st.session_state.fase == "ejecutando":
+                st.success("Sesión musical en curso. ¡Disfruta tu entrenamiento!")
+                if st.button("⏹ Finalizar sesión"):
+                    c.execute("""INSERT INTO sesiones (correo, fecha, entrenamiento, distancia, bpm_actual, fatiga, playlist, mensaje)
+                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                              (correo, datetime.now().strftime("%Y-%m-%d %H:%M"), tipo_entrenamiento, distancia,
+                               bpm_actual, fatiga, st.session_state.resultado_playlist, st.session_state.resultado_mensaje))
+                    conn.commit()
+                    st.success("Sesión guardada exitosamente.")
+                    st.session_state.fase = "inicio"
 
 elif menu == "Iniciar sesión":
     correo = st.text_input("Correo electrónico")
