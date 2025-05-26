@@ -114,18 +114,18 @@ if st.session_state.logged_in:
         if st.button("✅ Ya comencé, continuar"):
             st.session_state.fase = "ejecutando"
 
-    if st.session_state.fase == "ejecutando":
-        st.success("Sesión musical en curso. ¡Disfruta tu entrenamiento!")
-        if st.button("⏹ Finalizar sesión"):
-            c.execute("INSERT INTO sesiones (correo, fecha, entrenamiento, distancia, bpm_actual, fatiga, playlist, mensaje) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", 
-                      (correo, datetime.now().strftime("%Y-%m-%d %H:%M"), st.session_state.tipo_entrenamiento,
-                       st.session_state.distancia, st.session_state.bpm_actual, st.session_state.fatiga,
-                       st.session_state.resultado_playlist, st.session_state.resultado_mensaje))
-            conn.commit()
-            st.success("Sesión guardada exitosamente.")
-            if st.button("🔙 Volver al inicio"):
-                st.session_state.fase = "inicio"
-                st.rerun()
+        if st.session_state.fase == "ejecutando":
+            st.success("Sesión musical en curso. ¡Disfruta tu entrenamiento!")
+            if st.button("⏹ Finalizar sesión"):
+                c.execute("INSERT INTO sesiones (correo, fecha, entrenamiento, distancia, bpm_actual, fatiga, playlist, mensaje) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", 
+                          (correo, datetime.now().strftime("%Y-%m-%d %H:%M"), st.session_state.tipo_entrenamiento,
+                           st.session_state.distancia, st.session_state.bpm_actual, st.session_state.fatiga,
+                           st.session_state.resultado_playlist, st.session_state.resultado_mensaje))
+                conn.commit()
+                st.success("Sesión guardada exitosamente.")
+                if st.button("🔙 Volver al inicio"):
+                    st.session_state.fase = "inicio"
+                    st.rerun()
 
 elif menu == "Iniciar sesión":
     correo = st.text_input("Correo electrónico")
