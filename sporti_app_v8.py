@@ -111,7 +111,7 @@ if st.session_state.logged_in:
             f'<a href="{st.session_state.resultado_url}" target="_blank">'
             f'<button style="background-color:#1DB954; color:white; padding:10px; border:none; border-radius:5px;">'
             f"🎧 Ir a Playlist en Spotify</button></a>", unsafe_allow_html=True)
-            if st.button("✅ Ya comencé, continuar"):
+        if st.button("✅ Ya comencé, continuar"):
                 st.session_state.fase = "ejecutando"
     
             if st.session_state.fase == "ejecutando":
