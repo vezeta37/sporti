@@ -105,13 +105,13 @@ if st.session_state.logged_in:
 
         st.info(mensaje)
 
-if st.button("🎶 Buscar Playlist"):
-    combinaciones = pd.read_excel("Sporti_Combinaciones_Musicales_Final.xlsx")
-    filtro = combinaciones[
-        (combinaciones["zona"] == tipo_entrenamiento) &
-        (combinaciones["musica"] == estilo_musical) &
-        (combinaciones["fatiga"] == fatiga)
-    ]
+    if st.button("🎶 Buscar Playlist"):
+        combinaciones = pd.read_excel("Sporti_Combinaciones_Musicales_Final.xlsx")
+        filtro = combinaciones[
+            (combinaciones["zona"] == tipo_entrenamiento) &
+            (combinaciones["musica"] == estilo_musical) &
+            (combinaciones["fatiga"] == fatiga)
+        ]
 
     if not filtro.empty:
         playlist = filtro.iloc[0]["playlist"]
