@@ -111,21 +111,21 @@ if st.session_state.logged_in:
             f'<a href="{st.session_state.resultado_url}" target="_blank">'
             f'<button style="background-color:#1DB954; color:white; padding:10px; border:none; border-radius:5px;">'
             f"🎧 Ir a Playlist en Spotify</button></a>", unsafe_allow_html=True)
-        if st.button("✅ Ya comencé, continuar"):
-            st.session_state.fase = "ejecutando"
-
-        if st.session_state.fase == "ejecutando":
-            st.success("Sesión musical en curso. ¡Disfruta tu entrenamiento!")
-            if st.button("⏹ Finalizar sesión"):
-                c.execute("INSERT INTO sesiones (correo, fecha, entrenamiento, distancia, bpm_actual, fatiga, playlist, mensaje) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", 
-                          (correo, datetime.now().strftime("%Y-%m-%d %H:%M"), st.session_state.tipo_entrenamiento,
-                           st.session_state.distancia, st.session_state.bpm_actual, st.session_state.fatiga,
-                           st.session_state.resultado_playlist, st.session_state.resultado_mensaje))
-                conn.commit()
-                st.success("Sesión guardada exitosamente.")
-                if st.button("🔙 Volver al inicio"):
-                    st.session_state.fase = "inicio"
-                    st.rerun()
+            if st.button("✅ Ya comencé, continuar"):
+                st.session_state.fase = "ejecutando"
+    
+            if st.session_state.fase == "ejecutando":
+                st.success("Sesión musical en curso. ¡Disfruta tu entrenamiento!")
+                if st.button("⏹ Finalizar sesión"):
+                    c.execute("INSERT INTO sesiones (correo, fecha, entrenamiento, distancia, bpm_actual, fatiga, playlist, mensaje) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", 
+                              (correo, datetime.now().strftime("%Y-%m-%d %H:%M"), st.session_state.tipo_entrenamiento,
+                               st.session_state.distancia, st.session_state.bpm_actual, st.session_state.fatiga,
+                               st.session_state.resultado_playlist, st.session_state.resultado_mensaje))
+                    conn.commit()
+                    st.success("Sesión guardada exitosamente.")
+                    if st.button("🔙 Volver al inicio"):
+                        st.session_state.fase = "inicio"
+                        st.rerun()
 
 elif menu == "Iniciar sesión":
     correo = st.text_input("Correo electrónico")
