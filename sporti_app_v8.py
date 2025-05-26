@@ -108,10 +108,10 @@ if st.session_state.logged_in:
         if st.button("🎶 Buscar Playlist"):
             combinaciones = pd.read_excel("Sporti_Combinaciones_Musicales_Final.xlsx")
             filtro = combinaciones[
-                (combinaciones["zona"] == Tipo_entrenamiento) &
-                (combinaciones["musica"] == Estilo_musical) &
-                (combinaciones["fatiga"] == Fatiga)
-            ]
+                    (combinaciones["Tipo_entrenamiento"] == tipo_entrenamiento) &
+                    (combinaciones["Estilo_musical"] == estilo_musical) &
+                    (combinaciones["Fatiga"] == fatiga)
+                ]
     
             if not filtro.empty:
                 playlist = filtro.iloc[0]["playlist"]
