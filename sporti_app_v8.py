@@ -113,17 +113,17 @@ if st.session_state.logged_in:
             (combinaciones["fatiga"] == fatiga)
         ]
 
-    if not filtro.empty:
-        playlist = filtro.iloc[0]["playlist"]
-        url = filtro.iloc[0]["url"]
-        mensaje = filtro.iloc[0]["mensaje"]
-        st.session_state.resultado_playlist = playlist
-        st.session_state.resultado_mensaje = mensaje
-        st.session_state.resultado_url = url
-        st.session_state.fase = "playlist"
-    else:
-        st.warning("No se encontró una playlist recomendada para esta combinación.")
-     # Esto va FUERA del else, con la misma indentación del if principal
+        if not filtro.empty:
+            playlist = filtro.iloc[0]["playlist"]
+            url = filtro.iloc[0]["url"]
+            mensaje = filtro.iloc[0]["mensaje"]
+            st.session_state.resultado_playlist = playlist
+            st.session_state.resultado_mensaje = mensaje
+            st.session_state.resultado_url = url
+            st.session_state.fase = "playlist"
+        else:
+            st.warning("No se encontró una playlist recomendada para esta combinación.")
+         # Esto va FUERA del else, con la misma indentación del if principal
     if st.session_state.fase == "playlist":
         st.success(f"Playlist recomendada: [{st.session_state.resultado_playlist}]({st.session_state.resultado_url})")
         st.markdown(
